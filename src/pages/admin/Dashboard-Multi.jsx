@@ -35,7 +35,7 @@ export default function AdminDashboard() {
 
   // Apps Script URL - UPDATE THIS WITH YOUR DEPLOYED APPS SCRIPT URL
   const APPS_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbymxGr0eX3FInN98WP1YiRm5Pdnf-wh2TZ9lUsfoaCMAo77Q5EFdQ2OjeC3YUvXLFl2/exec"
+    "https://script.google.com/macros/s/AKfycbyIKWmXCI9mIraDluAp8DWXwOZi7GhOtB-q7lIRRHRSRaKYjz6fJVhSRvqUZOP-5NWC/exec"
 
   // State for department data
   const [departmentData, setDepartmentData] = useState({
