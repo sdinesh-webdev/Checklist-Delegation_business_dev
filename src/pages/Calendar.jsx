@@ -166,7 +166,7 @@ const CalendarUI = ({ userRole, userName, displayName }) => {
 
   // Dynamic URL from sessionStorage
   const BACKEND_URL =
-    "https://script.google.com/macros/s/AKfycbyIKWmXCI9mIraDluAp8DWXwOZi7GhOtB-q7lIRRHRSRaKYjz6fJVhSRvqUZOP-5NWC/exec";
+    "https://script.google.com/macros/s/AKfycbw7hMLxUdRO4Gl_JRLtl2B5Q_FRJuCaOPC7dj_Ezvk1EPbUJR6q88AMF0oQtPCoFoFi/exec";
 
   // ---- STATE ----
   const [events, setEvents] = useState([]);

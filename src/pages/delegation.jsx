@@ -17,10 +17,10 @@ import AdminLayout from "../components/layout/AdminLayout";
 const CONFIG = {
   // Google Apps Script URL
   APPS_SCRIPT_URL:
-    "https://script.google.com/macros/s/AKfycbyIKWmXCI9mIraDluAp8DWXwOZi7GhOtB-q7lIRRHRSRaKYjz6fJVhSRvqUZOP-5NWC/exec",
+    "https://script.google.com/macros/s/AKfycbw7hMLxUdRO4Gl_JRLtl2B5Q_FRJuCaOPC7dj_Ezvk1EPbUJR6q88AMF0oQtPCoFoFi/exec",
 
   // Google Drive folder ID for file uploads
-  DRIVE_FOLDER_ID: "1GrG_LuUI9387mah0e9mg4wJS-bk5qzHy",
+  DRIVE_FOLDER_ID: "1FjwJ3CXQl1aFZWswaklOVva-jhXnoQ8k",
 
   // Sheet names
   SOURCE_SHEET_NAME: "DELEGATION",
