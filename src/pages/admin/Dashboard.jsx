@@ -94,7 +94,7 @@ export default function AdminDashboard() {
       filteredTasks = [...allTasks];
     } else if (type === 'completed') {
       filteredTasks = allTasks.filter(task =>
-        task.status === 'completed' && !task.isArchive
+        task.status === 'completed'
       );
     } else if (type === 'pending') {
       if (dashboardType === 'delegation') {
@@ -650,12 +650,16 @@ export default function AdminDashboard() {
           totalTasks++;
           staffData.totalTasks++;
 
-          // SPECIAL LOGIC: Archive tasks only count towards TOTAL, not COMPLETED/PENDING/OVERDUE
           // As requested by user: "only remove this logic for three cards completed ,pending and overdue 
           // and remain same logic fetch data two sheet in one cards Total task card"
+          // UPDATED: Now also include archive tasks in completed card as per latest request
           if (isArchive) {
-            // Already added to totalTasks above.
-            // Do NOT add to completed/pending/overdue
+            // Archive tasks ALSO count towards COMPLETED if status is completed
+            if (status === 'completed') {
+              completedTasks++;
+              staffData.completedTasks++;
+              statusData.Completed++;
+            }
           } else {
             // Regular logic for non-archive tasks
             if (status === 'completed') {
