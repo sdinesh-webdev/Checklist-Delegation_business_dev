@@ -55,6 +55,7 @@ export default function AdminDashboard() {
     completedRatingTwo: 0,
     completedRatingThreePlus: 0,
     notDoneTasks: 0,
+    taskCompletionFrequencyMap: new Map(), // Map of Task ID -> completion count
   });
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -93,27 +94,47 @@ export default function AdminDashboard() {
     if (type === 'total') {
       filteredTasks = [...allTasks];
     } else if (type === 'completed') {
-      filteredTasks = allTasks.filter(task =>
-        task.status === 'completed'
-      );
-    } else if (type === 'pending') {
       if (dashboardType === 'delegation') {
+        // For delegation: show tasks completed exactly once
         filteredTasks = allTasks.filter(task => {
-          if (task.status === 'completed') return false;
-          return true;
+          const completionCount = departmentData.taskCompletionFrequencyMap.get(task.id) || 0;
+          return completionCount === 1;
         });
       } else {
+        // For checklist: show all completed tasks
+        filteredTasks = allTasks.filter(task =>
+          task.status === 'completed'
+        );
+      }
+    } else if (type === 'pending') {
+      if (dashboardType === 'delegation') {
+        // For delegation: show tasks completed exactly twice
+        filteredTasks = allTasks.filter(task => {
+          const completionCount = departmentData.taskCompletionFrequencyMap.get(task.id) || 0;
+          return completionCount === 2;
+        });
+      } else {
+        // For checklist: show pending tasks
         filteredTasks = allTasks.filter(task =>
           task.status !== 'completed'
         );
       }
     } else if (type === 'overdue') {
-      filteredTasks = allTasks.filter(task => {
-        if (task.status === 'completed') return false;
-        const taskDate = parseDateFromDDMMYYYY(task.taskStartDate);
-        if (!taskDate) return false;
-        return taskDate < today;
-      });
+      if (dashboardType === 'delegation') {
+        // For delegation: show tasks completed 3 or more times
+        filteredTasks = allTasks.filter(task => {
+          const completionCount = departmentData.taskCompletionFrequencyMap.get(task.id) || 0;
+          return completionCount >= 3;
+        });
+      } else {
+        // For checklist: show overdue tasks
+        filteredTasks = allTasks.filter(task => {
+          if (task.status === 'completed') return false;
+          const taskDate = parseDateFromDDMMYYYY(task.taskStartDate);
+          if (!taskDate) return false;
+          return taskDate < today;
+        });
+      }
     } else if (type === 'notDone') {
       filteredTasks = allTasks.filter(task => {
         const statusColumnValue = task.notDoneStatus;
@@ -386,11 +407,14 @@ export default function AdminDashboard() {
   const fetchDepartmentData = async () => {
     const sheetName = dashboardType === "delegation" ? "DELEGATION" : "Checklist";
     const archiveSheetName = "Archieve";
+    const delegationDoneSheetName = "DELEGATION DONE";
 
     try {
       console.log(`Fetching data for dashboard type: ${dashboardType}, primary sheet: ${sheetName}`);
       if (dashboardType === "checklist") {
         console.log(`Also fetching archive data from: ${archiveSheetName}`);
+      } else if (dashboardType === "delegation") {
+        console.log(`Also fetching delegation done data from: ${delegationDoneSheetName}`);
       }
 
       // FIXED: Use the correct Google Apps Script endpoint
@@ -408,6 +432,16 @@ export default function AdminDashboard() {
       if (dashboardType === "checklist") {
         fetchPromises.push(
           fetch(`${scriptUrl}?sheet=${archiveSheetName}&t=${Date.now()}`, {
+            method: 'GET',
+            redirect: 'follow',
+          })
+        );
+      }
+
+      // If delegation mode, also fetch the DELEGATION DONE sheet
+      if (dashboardType === "delegation") {
+        fetchPromises.push(
+          fetch(`${scriptUrl}?sheet=${delegationDoneSheetName}&t=${Date.now()}`, {
             method: 'GET',
             redirect: 'follow',
           })
@@ -472,6 +506,70 @@ export default function AdminDashboard() {
         }
       }
 
+      // Handle delegation done data if in delegation mode
+      let delegationDoneData = null;
+      const taskCompletionFrequencyMap = new Map(); // Map of Task ID -> completion count
+
+      // Initialize delegation completion counters (must be before forEach loop)
+      let completedRatingOne = 0;
+      let completedRatingTwo = 0;
+      let completedRatingThreePlus = 0;
+
+      if (dashboardType === "delegation" && responses[1]) {
+        try {
+          if (responses[1].ok) {
+            const delegationDoneText = await responses[1].text();
+            try {
+              delegationDoneData = JSON.parse(delegationDoneText);
+            } catch (e) {
+              const jsonStart = delegationDoneText.indexOf('{');
+              const jsonEnd = delegationDoneText.lastIndexOf('}');
+              if (jsonStart !== -1 && jsonEnd !== -1) {
+                const jsonString = delegationDoneText.substring(jsonStart, jsonEnd + 1);
+                delegationDoneData = JSON.parse(jsonString);
+              }
+            }
+
+            if (delegationDoneData && delegationDoneData.table && delegationDoneData.table.rows) {
+              console.log("DELEGATION DONE rows count:", delegationDoneData.table.rows.length - 1);
+
+              // Build completion frequency map by counting Task IDs in DELEGATION DONE sheet
+              // Skip header row (index 0)
+              for (let i = 1; i < delegationDoneData.table.rows.length; i++) {
+                const row = delegationDoneData.table.rows[i];
+                const taskId = getCellValue(row, 1); // Column B - Task ID
+
+                if (taskId && taskId !== '') {
+                  const taskIdStr = String(taskId).trim();
+                  const currentCount = taskCompletionFrequencyMap.get(taskIdStr) || 0;
+                  taskCompletionFrequencyMap.set(taskIdStr, currentCount + 1);
+                }
+              }
+
+              console.log("Task completion frequency map built:", taskCompletionFrequencyMap.size, "unique tasks");
+
+              // Calculate completion frequency counts directly from the map
+              // This ensures we count all tasks in DELEGATION DONE regardless of DELEGATION sheet status
+              taskCompletionFrequencyMap.forEach((count, taskId) => {
+                if (count === 1) {
+                  completedRatingOne++;
+                } else if (count === 2) {
+                  completedRatingTwo++;
+                } else if (count >= 3) {
+                  completedRatingThreePlus++;
+                }
+                console.log(`Task ${taskId} completed ${count} time(s)`);
+              });
+
+              console.log(`Completion counts - Once: ${completedRatingOne}, Twice: ${completedRatingTwo}, 3+: ${completedRatingThreePlus}`);
+            }
+          }
+        } catch (delegationDoneErr) {
+          console.error("Error processing delegation done data:", delegationDoneErr);
+          // Don't fail the whole fetch if delegation done fails
+        }
+      }
+
       console.log("Primary data parsed successfully, rows:", data.table.rows.length);
 
       // Get current user details
@@ -484,10 +582,8 @@ export default function AdminDashboard() {
       let pendingTasks = 0;
       let overdueTasks = 0;
 
-      // Add new counters for delegation mode
-      let completedRatingOne = 0;
-      let completedRatingTwo = 0;
-      let completedRatingThreePlus = 0;
+      // Note: completedRatingOne, completedRatingTwo, completedRatingThreePlus
+      // are initialized earlier (line 493-495) before DELEGATION DONE processing
 
       // Monthly data for bar chart
       const monthlyData = {
@@ -667,13 +763,9 @@ export default function AdminDashboard() {
               staffData.completedTasks++;
               statusData.Completed++;
 
-              // Count by rating (delegation only)
-              if (dashboardType === "delegation") {
-                const ratingValue = getCellValue(row, 17);
-                if (ratingValue === 1) completedRatingOne++;
-                else if (ratingValue === 2) completedRatingTwo++;
-                else if (ratingValue > 2) completedRatingThreePlus++;
-              }
+              // Note: Completion frequency counts (completedRatingOne, completedRatingTwo, completedRatingThreePlus)
+              // are now calculated directly from taskCompletionFrequencyMap after it's built,
+              // not here in the task processing loop
 
               // Update monthly data
               const completedMonth = parseDateFromDDMMYYYY(completionDate);
@@ -757,7 +849,8 @@ export default function AdminDashboard() {
         pieChartData,
         completedRatingOne,
         completedRatingTwo,
-        completedRatingThreePlus
+        completedRatingThreePlus,
+        taskCompletionFrequencyMap, // Store the frequency map in state
       });
 
       console.log("Department data updated successfully");
@@ -779,7 +872,8 @@ export default function AdminDashboard() {
         pieChartData: [],
         completedRatingOne: 0,
         completedRatingTwo: 0,
-        completedRatingThreePlus: 0
+        completedRatingThreePlus: 0,
+        taskCompletionFrequencyMap: new Map(), // Initialize empty map on error
       });
     }
   };
