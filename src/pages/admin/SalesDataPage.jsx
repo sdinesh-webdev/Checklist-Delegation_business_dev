@@ -733,15 +733,16 @@ function AccountDataPage() {
     }
   };
 
-  const isSubmitEnabled = useMemo(() => {
-    if (selectedItems.size === 0) return false;
+const isSubmitEnabled = useMemo(() => {
+  if (selectedItems.size === 0) return false;
 
-    const selectedItemsArray = Array.from(selectedItems);
-    // console.log("sleectedItemsArray", selectedItemsArray);
-    return selectedItemsArray.every(
-      (id) => additionalData[id] === "Yes" || additionalData[id] === "Not Done" && additionalData[id] === "Not Required",
-    );
-  }, [selectedItems, additionalData]);
+  const selectedItemsArray = Array.from(selectedItems);
+
+  return selectedItemsArray.every((id) =>
+    ["Yes", "Not Done", "Not Required"].includes(additionalData[id])
+  );
+}, [selectedItems, additionalData]);
+
 
   // Memoized filtered data to prevent unnecessary re-renders
   const filteredAccountData = useMemo(() => {
