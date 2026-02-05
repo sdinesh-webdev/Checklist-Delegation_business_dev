@@ -2460,6 +2460,7 @@ function AccountDataPage() {
                                 <option value="">Select...</option>
                                 <option value="Yes">Yes</option>
                                 <option value="Not Done">Not Done</option>
+                                <option value="Not Done">Not Required</option>
                               </select>
                             </td>
                             <td className="px-3 py-4 bg-orange-50 min-w-[150px]">
