@@ -5,7 +5,6 @@ import {
   useCallback,
   useMemo,
   useRef,
-  captureBtnRef,
 } from "react";
 import {
   CheckCircle2,
@@ -85,7 +84,7 @@ function AccountDataPage() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isCameraLoading, setIsCameraLoading] = useState(false); // ✅ Ye line check karo
-  // Add these functions in your component (around line 150-250, after other functions)
+  const captureBtnRef = useRef(null);
 
   // Camera cleanup when component unmounts
   useEffect(() => {
@@ -95,8 +94,8 @@ function AccountDataPage() {
       }
     };
   }, [cameraStream]);
-  // ✅ Add these camera functions in your component (around line 150-250)
 
+  // ✅ Add these camera functions in your component (around line 150-250)
   const startCamera = async () => {
     try {
       setCameraError("");
@@ -357,6 +356,7 @@ function AccountDataPage() {
   };
 
   const isAdmin = userRole === "admin";
+
   // UPDATED: Format date-time to DD/MM/YYYY HH:MM:SS
   const formatDateTimeToDDMMYYYY = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
@@ -387,7 +387,6 @@ function AccountDataPage() {
   useEffect(() => {
     const role = sessionStorage.getItem("role");
     const user = sessionStorage.getItem("username");
-
     const assignPersonData = sessionStorage.getItem("AssignPerson");
 
     setUserRole(role || "");
@@ -519,14 +518,6 @@ function AccountDataPage() {
       const statusToSend =
         newStatus === "" || newStatus === undefined ? "" : newStatus;
 
-      // console.log('=== EDIT DEBUG INFO ===')
-      // console.log('Row ID:', rowId)
-      // console.log('Original Status:', historyItem["col15"])
-      // console.log('New Status:', newStatus)
-      // console.log('Status to Send:', statusToSend)
-      // console.log('Task ID:', historyItem._taskId || historyItem["col1"])
-      // console.log('Row Index:', historyItem._rowIndex)
-
       const submissionData = [
         {
           taskId: historyItem._taskId || historyItem["col1"],
@@ -535,14 +526,11 @@ function AccountDataPage() {
         },
       ];
 
-      // console.log('Submission Data:', JSON.stringify(submissionData, null, 2))
-
       const formData = new FormData();
       formData.append("sheetName", CONFIG.SHEET_NAME);
       formData.append("action", "updateAdminDone");
       formData.append("rowData", JSON.stringify(submissionData));
 
-      // console.log('Making API request...')
       const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
         method: "POST",
         body: formData,
@@ -559,14 +547,10 @@ function AccountDataPage() {
         throw new Error(`Invalid response format: ${responseText}`);
       }
 
-      // console.log('Parsed Result:', result)
-
       if (result.success) {
         // Update local state - use empty string for cleared status
         const updatedStatus =
           newStatus === "" || newStatus === undefined ? "" : newStatus;
-
-        // console.log('Updating local state with:', updatedStatus)
 
         setHistoryData((prev) =>
           prev.map((item) =>
@@ -591,7 +575,6 @@ function AccountDataPage() {
 
         // Refresh data after a short delay
         setTimeout(() => {
-          // console.log('Refreshing data...')
           fetchSheetData();
         }, 3000);
       } else {
@@ -733,27 +716,26 @@ function AccountDataPage() {
     }
   };
 
-const isSubmitEnabled = useMemo(() => {
-  if (selectedItems.size === 0) return false;
+  const isSubmitEnabled = useMemo(() => {
+    if (selectedItems.size === 0) return false;
 
-  const selectedItemsArray = Array.from(selectedItems);
+    const selectedItemsArray = Array.from(selectedItems);
 
-  return selectedItemsArray.every((id) =>
-    ["Yes", "Not Done", "Not Required"].includes(additionalData[id])
-  );
-}, [selectedItems, additionalData]);
-
+    return selectedItemsArray.every((id) =>
+      ["Yes", "Not Done", "Not Required"].includes(additionalData[id])
+    );
+  }, [selectedItems, additionalData]);
 
   // Memoized filtered data to prevent unnecessary re-renders
   const filteredAccountData = useMemo(() => {
     let filtered = searchTerm
       ? accountData.filter((account) =>
-          Object.values(account).some(
-            (value) =>
-              value &&
-              value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
-          ),
-        )
+        Object.values(account).some(
+          (value) =>
+            value &&
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+        ),
+      )
       : accountData;
 
     // Apply Status Filter
@@ -790,13 +772,13 @@ const isSubmitEnabled = useMemo(() => {
       .filter((item) => {
         const matchesSearch = searchTerm
           ? Object.values(item).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchTerm.toLowerCase()),
-            )
+            (value) =>
+              value &&
+              value
+                .toString()
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()),
+          )
           : true;
         const matchesMember =
           selectedMembers.length > 0
@@ -835,14 +817,14 @@ const isSubmitEnabled = useMemo(() => {
     const memberStats =
       selectedMembers.length > 0
         ? selectedMembers.reduce((stats, member) => {
-            const memberTasks = historyData.filter(
-              (task) => task["col4"] === member,
-            ).length;
-            return {
-              ...stats,
-              [member]: memberTasks,
-            };
-          }, {})
+          const memberTasks = historyData.filter(
+            (task) => task["col4"] === member,
+          ).length;
+          return {
+            ...stats,
+            [member]: memberTasks,
+          };
+        }, {})
         : {};
     const filteredTotal = filteredHistoryData.length;
     return {
@@ -951,8 +933,8 @@ const isSubmitEnabled = useMemo(() => {
         const stableId = taskId
           ? `task_${taskId}_${googleSheetsRowIndex}`
           : `row_${googleSheetsRowIndex}_${Math.random()
-              .toString(36)
-              .substring(2, 15)}`;
+            .toString(36)
+            .substring(2, 15)}`;
 
         const rowData = {
           _id: stableId,
@@ -1035,7 +1017,6 @@ const isSubmitEnabled = useMemo(() => {
 
   // Checkbox handlers with better state management
   const handleSelectItem = useCallback((id, isChecked) => {
-    // console.log(`Checkbox action: ${id} -> ${isChecked}`)
     setSelectedItems((prev) => {
       const newSelected = new Set(prev);
       if (isChecked) {
@@ -1059,7 +1040,6 @@ const isSubmitEnabled = useMemo(() => {
           return newData;
         });
       }
-      // console.log(`Updated selection: ${Array.from(newSelected)}`)
       return newSelected;
     });
   }, []);
@@ -1068,7 +1048,6 @@ const isSubmitEnabled = useMemo(() => {
     (e, id) => {
       e.stopPropagation();
       const isChecked = e.target.checked;
-      // console.log(`Checkbox clicked: ${id}, checked: ${isChecked}`)
       handleSelectItem(id, isChecked);
     },
     [handleSelectItem],
@@ -1078,17 +1057,14 @@ const isSubmitEnabled = useMemo(() => {
     (e) => {
       e.stopPropagation();
       const checked = e.target.checked;
-      // console.log(`Select all clicked: ${checked}`)
       if (checked) {
         const allIds = filteredAccountData.map((item) => item._id);
         setSelectedItems(new Set(allIds));
-        // console.log(`Selected all items: ${allIds}`)
       } else {
         setSelectedItems(new Set());
         setAdditionalData({});
         setRemarksData({});
         setSubCategoryUpdates({});
-        // console.log("Cleared all selections")
       }
     },
     [filteredAccountData],
@@ -1478,34 +1454,15 @@ const isSubmitEnabled = useMemo(() => {
               </select>
             </div>
 
-            {/* Toggle history button */}
-            {/* <button
-              onClick={toggleHistory}
-              className="rounded-md bg-gradient-to-r from-blue-500 to-indigo-600 py-2 px-4 text-white hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full sm:w-auto text-center"
-            >
-              {showHistory ? (
-                <div className="flex items-center justify-center sm:justify-start">
-                  <ArrowLeft className="h-4 w-4 mr-1" />
-                  <span>Back to Tasks</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center sm:justify-start">
-                  <History className="h-4 w-4 mr-1" />
-                  <span>View History</span>
-                </div>
-              )}
-            </button> */}
-
             {/* Submit button (only when not history view) */}
             {!showHistory && (
               <button
                 onClick={handleSubmit}
                 disabled={!isSubmitEnabled || isSubmitting}
-                className={`rounded-md py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 w-full sm:w-auto ${
-                  isSubmitEnabled && !isSubmitting
+                className={`rounded-md py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 w-full sm:w-auto ${isSubmitEnabled && !isSubmitting
                     ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 cursor-pointer"
                     : "bg-gray-400 cursor-not-allowed opacity-50"
-                }`}
+                  }`}
               >
                 {isSubmitting
                   ? "Processing..."
@@ -1557,9 +1514,8 @@ const isSubmitEnabled = useMemo(() => {
               </h2>
               <p className="text-purple-600 text-sm">
                 {showHistory
-                  ? `${CONFIG.PAGE_CONFIG.historyDescription} for ${
-                      userRole === "admin" ? "all" : "your"
-                    } tasks`
+                  ? `${CONFIG.PAGE_CONFIG.historyDescription} for ${userRole === "admin" ? "all" : "your"
+                  } tasks`
                   : CONFIG.PAGE_CONFIG.description}
               </p>
             </div>
@@ -1660,13 +1616,13 @@ const isSubmitEnabled = useMemo(() => {
                     startDate ||
                     endDate ||
                     searchTerm) && (
-                    <button
-                      onClick={resetFilters}
-                      className="px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 text-sm"
-                    >
-                      Clear All Filters
-                    </button>
-                  )}
+                      <button
+                        onClick={resetFilters}
+                        className="px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 text-sm"
+                      >
+                        Clear All Filters
+                      </button>
+                    )}
                 </div>
               </div>
 
@@ -1699,15 +1655,15 @@ const isSubmitEnabled = useMemo(() => {
                       startDate ||
                       endDate ||
                       searchTerm) && (
-                      <div className="px-3 py-2 bg-white rounded-md shadow-sm">
-                        <span className="text-xs text-gray-500">
-                          Filtered Results
-                        </span>
-                        <div className="text-lg font-semibold text-blue-600">
-                          {getTaskStatistics().filteredTotal}
+                        <div className="px-3 py-2 bg-white rounded-md shadow-sm">
+                          <span className="text-xs text-gray-500">
+                            Filtered Results
+                          </span>
+                          <div className="text-lg font-semibold text-blue-600">
+                            {getTaskStatistics().filteredTotal}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                     {selectedMembers.map((member) => (
                       <div
                         key={member}
@@ -1749,17 +1705,17 @@ const isSubmitEnabled = useMemo(() => {
                                     (item["col15"].toString().trim() !==
                                       "Done" &&
                                       item["col15"].toString().trim() !==
-                                        "Not Done"),
+                                      "Not Done"),
                                 ).length > 0 &&
                                 selectedHistoryItems.length ===
-                                  filteredHistoryData.filter(
-                                    (item) =>
-                                      isEmpty(item["col15"]) ||
-                                      (item["col15"].toString().trim() !==
-                                        "Done" &&
-                                        item["col15"].toString().trim() !==
-                                          "Not Done"),
-                                  ).length
+                                filteredHistoryData.filter(
+                                  (item) =>
+                                    isEmpty(item["col15"]) ||
+                                    (item["col15"].toString().trim() !==
+                                      "Done" &&
+                                      item["col15"].toString().trim() !==
+                                      "Not Done"),
+                                ).length
                               }
                               onChange={(e) => {
                                 const unprocessedItems =
@@ -1769,7 +1725,7 @@ const isSubmitEnabled = useMemo(() => {
                                       (item["col15"].toString().trim() !==
                                         "Done" &&
                                         item["col15"].toString().trim() !==
-                                          "Not Done"),
+                                        "Not Done"),
                                   );
                                 if (e.target.checked) {
                                   setSelectedHistoryItems(unprocessedItems);
@@ -1912,7 +1868,7 @@ const isSubmitEnabled = useMemo(() => {
                                   <div className="flex items-center justify-between">
                                     <div>
                                       {!isEmpty(history["col15"]) &&
-                                      history["col15"].toString().trim() ===
+                                        history["col15"].toString().trim() ===
                                         "Done" ? (
                                         <div className="flex items-center">
                                           <div className="h-4 w-4 rounded border-gray-300 text-green-600 bg-green-100 mr-2 flex items-center justify-center">
@@ -1928,7 +1884,7 @@ const isSubmitEnabled = useMemo(() => {
                                         </div>
                                       ) : !isEmpty(history["col15"]) &&
                                         history["col15"].toString().trim() ===
-                                          "Not Done" ? (
+                                        "Not Done" ? (
                                         <div className="flex items-center text-red-500 text-sm">
                                           <div className="h-4 w-4 rounded border-gray-300 bg-red-100 mr-2 flex items-center justify-center">
                                             <span className="text-xs text-red-600">
@@ -1962,41 +1918,38 @@ const isSubmitEnabled = useMemo(() => {
                             {userRole === "admin" && (
                               <td className="px-3 py-4 w-12">
                                 {!isEmpty(history["col15"]) &&
-                                (history["col15"].toString().trim() ===
-                                  "Done" ||
-                                  history["col15"].toString().trim() ===
+                                  (history["col15"].toString().trim() ===
+                                    "Done" ||
+                                    history["col15"].toString().trim() ===
                                     "Not Done") ? (
                                   // Already processed - show status only
                                   <div className="flex flex-col items-center">
                                     <div
-                                      className={`h-4 w-4 rounded border-gray-300 ${
-                                        history["col15"].toString().trim() ===
-                                        "Done"
+                                      className={`h-4 w-4 rounded border-gray-300 ${history["col15"].toString().trim() ===
+                                          "Done"
                                           ? "text-green-600 bg-green-100"
                                           : "text-red-600 bg-red-100"
-                                      }`}
+                                        }`}
                                     >
                                       <span
-                                        className={`text-xs ${
-                                          history["col15"].toString().trim() ===
-                                          "Done"
+                                        className={`text-xs ${history["col15"].toString().trim() ===
+                                            "Done"
                                             ? "text-green-600"
                                             : "text-red-600"
-                                        }`}
+                                          }`}
                                       >
                                         {history["col15"].toString().trim() ===
-                                        "Done"
+                                          "Done"
                                           ? "✓"
                                           : "✗"}
                                       </span>
                                     </div>
                                     <span
-                                      className={`text-xs mt-1 text-center break-words ${
-                                        history["col15"].toString().trim() ===
-                                        "Done"
+                                      className={`text-xs mt-1 text-center break-words ${history["col15"].toString().trim() ===
+                                          "Done"
                                           ? "text-green-600"
                                           : "text-red-600"
-                                      }`}
+                                        }`}
                                     >
                                       {history["col15"].toString().trim()}
                                     </span>
@@ -2016,9 +1969,9 @@ const isSubmitEnabled = useMemo(() => {
                                             (item) => item._id === history._id,
                                           )
                                             ? prev.filter(
-                                                (item) =>
-                                                  item._id !== history._id,
-                                              )
+                                              (item) =>
+                                                item._id !== history._id,
+                                            )
                                             : [...prev, history],
                                         );
                                       }}
@@ -2143,13 +2096,12 @@ const isSubmitEnabled = useMemo(() => {
                             </td>
                             <td className="px-3 py-4 bg-blue-50 min-w-[80px]">
                               <span
-                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full break-words ${
-                                  history["col12"] === "Yes"
+                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full break-words ${history["col12"] === "Yes"
                                     ? "bg-green-100 text-green-800"
                                     : history["col12"] === "No"
                                       ? "bg-red-100 text-red-800"
                                       : "bg-gray-100 text-gray-800"
-                                }`}
+                                  }`}
                               >
                                 {history["col12"] || "—"}
                               </span>
@@ -2207,9 +2159,9 @@ const isSubmitEnabled = useMemo(() => {
                           className="px-6 py-4 text-center text-gray-500"
                         >
                           {searchTerm ||
-                          selectedMembers.length > 0 ||
-                          startDate ||
-                          endDate
+                            selectedMembers.length > 0 ||
+                            startDate ||
+                            endDate
                             ? "No historical records matching your filters"
                             : "No completed records found"}
                         </td>
@@ -2287,9 +2239,12 @@ const isSubmitEnabled = useMemo(() => {
                       <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                         Upload Image
                       </th>
-                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-                        Delete
-                      </th>
+                      {/* Delete Column - केवल admin के लिए */}
+                      {isAdmin && (
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
+                          Delete
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -2299,9 +2254,8 @@ const isSubmitEnabled = useMemo(() => {
                         return (
                           <tr
                             key={account._id}
-                            className={`${
-                              isSelected ? "bg-purple-50" : ""
-                            } hover:bg-gray-50`}
+                            className={`${isSelected ? "bg-purple-50" : ""
+                              } hover:bg-gray-50`}
                           >
                             <td className="px-3 py-4 w-12 relative">
                               {/* Status Label - Fixed positioning */}
@@ -2450,8 +2404,6 @@ const isSubmitEnabled = useMemo(() => {
                                     setRemarksData((prev) => {
                                       const newData = { ...prev };
                                       delete newData[account._id];
-
-                                      // console.log("new DAta",newData);
                                       return newData;
                                     });
                                   }
@@ -2461,7 +2413,7 @@ const isSubmitEnabled = useMemo(() => {
                                 <option value="">Select...</option>
                                 <option value="Yes">Yes</option>
                                 <option value="Not Done">Not Done</option>
-                                <option value="Not Done">Not Required</option>
+                                <option value="Not Required">Not Required</option>
                               </select>
                             </td>
                             <td className="px-3 py-4 bg-orange-50 min-w-[150px]">
@@ -2522,36 +2474,16 @@ const isSubmitEnabled = useMemo(() => {
                               ) : (
                                 // ✅ SHOW UPLOAD OPTIONS
                                 <div className="flex flex-col gap-2">
-                                  {/* ✅ CAMERA BUTTON - Opens Modal */}
-                                  {/* <button
-        onClick={() => {
-          if (!isSelected) return;
-          console.log("📸 Opening camera for:", account._id);
-          setCurrentCaptureId(account._id);
-          startCamera();
-        }}
-        disabled={!isSelected || isCameraLoading}
-        className={`flex items-center justify-start px-2 py-1 rounded text-xs font-medium transition-colors ${
-          isSelected 
-            ? "text-blue-600 hover:text-blue-800 hover:bg-blue-50" 
-            : "text-gray-400 cursor-not-allowed"
-        } disabled:opacity-50`}
-      >
-        <Camera className="h-4 w-4 mr-1 flex-shrink-0" />
-        <span>{isCameraLoading ? "Loading..." : "Take Photo"}</span>
-      </button> */}
-
                                   {/* ✅ FILE UPLOAD BUTTON - Opens File Picker */}
                                   <label
                                     htmlFor={`upload-${account._id}`}
-                                    className={`flex items-center justify-start px-2 py-1 rounded text-xs font-medium transition-colors ${
-                                      isSelected
+                                    className={`flex items-center justify-start px-2 py-1 rounded text-xs font-medium transition-colors ${isSelected
                                         ? account["col9"]?.toUpperCase() ===
                                           "YES"
                                           ? "text-red-600 hover:text-red-800 hover:bg-red-50 cursor-pointer"
                                           : "text-purple-600 hover:text-purple-800 hover:bg-purple-50 cursor-pointer"
                                         : "text-gray-400 cursor-not-allowed"
-                                    }`}
+                                      }`}
                                   >
                                     <Upload className="h-4 w-4 mr-1 flex-shrink-0" />
                                     <span className="break-words">
@@ -2578,22 +2510,25 @@ const isSubmitEnabled = useMemo(() => {
                                 </div>
                               )}
                             </td>
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (!confirm("Delete row permanently?"))
-                                    return;
-                                  handleDeleteRow(account);
-                                }}
-                                disabled={deletingRows.has(account._id)}
-                                className="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
-                              >
-                                {deletingRows.has(account._id)
-                                  ? "Deleting..."
-                                  : "Delete"}
-                              </button>
-                            </td>
+                            {/* Delete Column - केवल admin के लिए */}
+                            {isAdmin && (
+                              <td className="px-3 py-4 whitespace-nowrap">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (!confirm("Delete row permanently?"))
+                                      return;
+                                    handleDeleteRow(account);
+                                  }}
+                                  disabled={deletingRows.has(account._id)}
+                                  className="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
+                                >
+                                  {deletingRows.has(account._id)
+                                    ? "Deleting..."
+                                    : "Delete"}
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         );
                       })
@@ -2621,9 +2556,8 @@ const isSubmitEnabled = useMemo(() => {
                     return (
                       <div
                         key={account._id}
-                        className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${
-                          isSelected ? "bg-purple-50 border-purple-200" : ""
-                        }`}
+                        className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${isSelected ? "bg-purple-50 border-purple-200" : ""
+                          }`}
                       >
                         <div className="space-y-3">
                           {/* Checkbox */}
@@ -2792,7 +2726,7 @@ const isSubmitEnabled = useMemo(() => {
                               <option value="">Select...</option>
                               <option value="Yes">Yes</option>
                               <option value="Not Done">Not Done</option>
-                              <option value="Not Done">Not Required</option>
+                              <option value="Not Required">Not Required</option>
                             </select>
                           </div>
 
@@ -2862,35 +2796,15 @@ const isSubmitEnabled = useMemo(() => {
                               // ✅ SHOW UPLOAD OPTIONS
                               <>
                                 <div className="flex flex-col gap-3 mt-2">
-                                  {/* ✅ CAMERA BUTTON */}
-                                  {/* <button
-          onClick={() => {
-            if (!isSelected) return;
-            console.log("📸 Opening camera for:", account._id);
-            setCurrentCaptureId(account._id);
-            startCamera();
-          }}
-          disabled={!isSelected || isCameraLoading}
-          className={`flex items-center justify-center px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
-            isSelected 
-              ? "bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:shadow-md active:scale-95" 
-              : "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
-          } disabled:opacity-50`}
-        >
-          <Camera className="h-5 w-5 mr-2" />
-          <span>{isCameraLoading ? "Loading Camera..." : "📸 Take Photo"}</span>
-        </button> */}
-
                                   {/* ✅ FILE UPLOAD BUTTON */}
                                   <label
-                                    className={`flex items-center justify-center px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${
-                                      isSelected
+                                    className={`flex items-center justify-center px-4 py-3 rounded-lg border-2 text-sm font-semibold transition-all ${isSelected
                                         ? account["col9"]?.toUpperCase() ===
                                           "YES"
                                           ? "bg-red-50 border-red-300 text-red-700 hover:bg-red-100 hover:shadow-md active:scale-95 cursor-pointer"
                                           : "bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 hover:shadow-md active:scale-95 cursor-pointer"
                                         : "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
-                                    } ${!isSelected ? "pointer-events-none" : ""}`}
+                                      } ${!isSelected ? "pointer-events-none" : ""}`}
                                   >
                                     <Upload className="h-5 w-5 mr-2" />
                                     <span>
@@ -2920,22 +2834,25 @@ const isSubmitEnabled = useMemo(() => {
                                   )}
                                 </div>
 
-                                <div className="mt-3">
-                                  <button
-                                    onClick={() => {
-                                      if (!isSelected) return;
-                                      if (!confirm("Delete permanently?"))
-                                        return;
-                                      handleDeleteRow(account);
-                                    }}
-                                    disabled={deletingRows.has(account._id)}
-                                    className="w-full py-2 rounded-lg border-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50"
-                                  >
-                                    {deletingRows.has(account._id)
-                                      ? "Deleting..."
-                                      : "Delete Task"}
-                                  </button>
-                                </div>
+                                {/* Delete Button - केवल admin के लिए */}
+                                {isAdmin && (
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => {
+                                        if (!isSelected) return;
+                                        if (!confirm("Delete permanently?"))
+                                          return;
+                                        handleDeleteRow(account);
+                                      }}
+                                      disabled={deletingRows.has(account._id)}
+                                      className="w-full py-2 rounded-lg border-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50"
+                                    >
+                                      {deletingRows.has(account._id)
+                                        ? "Deleting..."
+                                        : "Delete Task"}
+                                    </button>
+                                  </div>
+                                )}
                               </>
                             )}
                           </div>
@@ -3061,11 +2978,10 @@ const isSubmitEnabled = useMemo(() => {
                   className={`
             relative w-20 h-20 sm:w-24 sm:h-24 rounded-full 
             flex items-center justify-center
-            ${
-              isCameraLoading || cameraError
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100 active:scale-95"
-            }
+            ${isCameraLoading || cameraError
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-white hover:bg-gray-100 active:scale-95"
+                    }
             transition-all duration-200
             shadow-2xl
           `}

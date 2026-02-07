@@ -753,15 +753,15 @@ function DelegationDataPage() {
   const filteredAccountData = useMemo(() => {
     const filtered = debouncedSearchTerm
       ? accountData.filter((account) =>
-          Object.values(account).some(
-            (value) =>
-              value &&
-              value
-                .toString()
-                .toLowerCase()
-                .includes(debouncedSearchTerm.toLowerCase()),
-          ),
-        )
+        Object.values(account).some(
+          (value) =>
+            value &&
+            value
+              .toString()
+              .toLowerCase()
+              .includes(debouncedSearchTerm.toLowerCase()),
+        ),
+      )
       : accountData;
 
     // Apply admin filters if user is admin
@@ -803,13 +803,13 @@ function DelegationDataPage() {
 
         const matchesSearch = debouncedSearchTerm
           ? Object.values(item).some(
-              (value) =>
-                value &&
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(debouncedSearchTerm.toLowerCase()),
-            )
+            (value) =>
+              value &&
+              value
+                .toString()
+                .toLowerCase()
+                .includes(debouncedSearchTerm.toLowerCase()),
+          )
           : true;
 
         let matchesDateRange = true;
@@ -916,8 +916,8 @@ function DelegationDataPage() {
 
                 const rowValues = row.c
                   ? row.c.map((cell) =>
-                      cell && cell.v !== undefined ? cell.v : "",
-                    )
+                    cell && cell.v !== undefined ? cell.v : "",
+                  )
                   : [];
 
                 // Map all columns including column H (col7) for user filtering and column I (col8) for Task
@@ -1001,8 +1001,8 @@ function DelegationDataPage() {
         const stableId = taskId
           ? `task_${taskId}_${googleSheetsRowIndex}`
           : `row_${googleSheetsRowIndex}_${Math.random()
-              .toString(36)
-              .substring(2, 15)}`;
+            .toString(36)
+            .substring(2, 15)}`;
 
         const rowData = {
           _id: stableId,
@@ -1471,9 +1471,8 @@ function DelegationDataPage() {
                     {nameFilter || "Filter by Name"}
                     <ChevronDown
                       size={16}
-                      className={`transition-transform ${
-                        dropdownOpen.name ? "rotate-180" : ""
-                      }`}
+                      className={`transition-transform ${dropdownOpen.name ? "rotate-180" : ""
+                        }`}
                     />
                   </button>
 
@@ -1485,11 +1484,10 @@ function DelegationDataPage() {
                       <div className="py-1">
                         <button
                           onClick={clearNameFilter}
-                          className={`block w-full text-left px-4 py-2 text-sm ${
-                            !nameFilter
-                              ? "bg-purple-100 text-purple-900"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
+                          className={`block w-full text-left px-4 py-2 text-sm ${!nameFilter
+                            ? "bg-purple-100 text-purple-900"
+                            : "text-gray-700 hover:bg-gray-100"
+                            }`}
                         >
                           All Names
                         </button>
@@ -1498,11 +1496,10 @@ function DelegationDataPage() {
                           <button
                             key={name}
                             onClick={() => handleNameFilterSelect(name)}
-                            className={`block w-full text-left px-4 py-2 text-sm ${
-                              nameFilter === name
-                                ? "bg-purple-100 text-purple-900"
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}
+                            className={`block w-full text-left px-4 py-2 text-sm ${nameFilter === name
+                              ? "bg-purple-100 text-purple-900"
+                              : "text-gray-700 hover:bg-gray-100"
+                              }`}
                           >
                             {name}
                           </button>
@@ -1523,9 +1520,8 @@ function DelegationDataPage() {
                     {departmentFilter || "Filter by Department"}
                     <ChevronDown
                       size={16}
-                      className={`transition-transform ${
-                        dropdownOpen.department ? "rotate-180" : ""
-                      }`}
+                      className={`transition-transform ${dropdownOpen.department ? "rotate-180" : ""
+                        }`}
                     />
                   </button>
 
@@ -1537,11 +1533,10 @@ function DelegationDataPage() {
                       <div className="py-1">
                         <button
                           onClick={clearDepartmentFilter}
-                          className={`block w-full text-left px-3 py-2 text-sm ${
-                            !departmentFilter
-                              ? "bg-purple-100 text-purple-900"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
+                          className={`block w-full text-left px-3 py-2 text-sm ${!departmentFilter
+                            ? "bg-purple-100 text-purple-900"
+                            : "text-gray-700 hover:bg-gray-100"
+                            }`}
                         >
                           All Departments
                         </button>
@@ -1550,11 +1545,10 @@ function DelegationDataPage() {
                           <button
                             key={dept}
                             onClick={() => handleDepartmentFilterSelect(dept)}
-                            className={`block w-full text-left px-3 py-2 text-sm ${
-                              departmentFilter === dept
-                                ? "bg-purple-100 text-purple-900"
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}
+                            className={`block w-full text-left px-3 py-2 text-sm ${departmentFilter === dept
+                              ? "bg-purple-100 text-purple-900"
+                              : "text-gray-700 hover:bg-gray-100"
+                              }`}
                           >
                             {dept}
                           </button>
@@ -1630,9 +1624,8 @@ function DelegationDataPage() {
             </h2>
             <p className="text-purple-600 text-sm">
               {showHistory
-                ? `${CONFIG.PAGE_CONFIG.historyDescription} for ${
-                    userRole === "admin" ? "all" : "your"
-                  } tasks`
+                ? `${CONFIG.PAGE_CONFIG.historyDescription} for ${userRole === "admin" ? "all" : "your"
+                } tasks`
                 : CONFIG.PAGE_CONFIG.description}
             </p>
           </div>
@@ -1776,13 +1769,12 @@ function DelegationDataPage() {
                           </td>
                           <td className="px-6 py-4 min-w-[100px]">
                             <span
-                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full whitespace-normal ${
-                                history["col2"] === "Done"
-                                  ? "bg-green-100 text-green-800"
-                                  : history["col2"] === "Extend date"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-gray-100 text-gray-800"
-                              }`}
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full whitespace-normal ${history["col2"] === "Done"
+                                ? "bg-green-100 text-green-800"
+                                : history["col2"] === "Extend date"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                                }`}
                             >
                               {history["col2"] || "—"}
                             </span>
@@ -1900,13 +1892,12 @@ function DelegationDataPage() {
                             Status:
                           </span>
                           <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              history["col2"] === "Done"
-                                ? "bg-green-100 text-green-800"
-                                : history["col2"] === "Extend date"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
-                            }`}
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${history["col2"] === "Done"
+                              ? "bg-green-100 text-green-800"
+                              : history["col2"] === "Extend date"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-gray-100 text-gray-800"
+                              }`}
                           >
                             {history["col2"] || "—"}
                           </span>
@@ -2030,50 +2021,46 @@ function DelegationDataPage() {
                         Task Description
                       </th>
                       <th
-                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px] ${
-                          !accountData["col17"] ? "bg-yellow-50" : ""
-                        }`}
+                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px] ${!accountData["col17"] ? "bg-yellow-50" : ""
+                          }`}
                       >
                         Task End Date
                       </th>
                       <th
-                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px] ${
-                          !accountData["col17"] ? "bg-green-50" : ""
-                        }`}
+                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px] ${!accountData["col17"] ? "bg-green-50" : ""
+                          }`}
                       >
                         Planned Date
                       </th>
                       <th
-                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px] ${
-                          !accountData["col17"] ? "bg-blue-50" : ""
-                        }`}
+                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px] ${!accountData["col17"] ? "bg-blue-50" : ""
+                          }`}
                       >
                         Status
                       </th>
                       <th
-                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px] ${
-                          !accountData["col17"] ? "bg-indigo-50" : ""
-                        }`}
+                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px] ${!accountData["col17"] ? "bg-indigo-50" : ""
+                          }`}
                       >
                         Next Target Date
                       </th>
                       <th
-                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px] ${
-                          !accountData["col17"] ? "bg-purple-50" : ""
-                        }`}
+                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px] ${!accountData["col17"] ? "bg-purple-50" : ""
+                          }`}
                       >
                         Remarks
                       </th>
                       <th
-                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px] ${
-                          !accountData["col17"] ? "bg-orange-50" : ""
-                        }`}
+                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px] ${!accountData["col17"] ? "bg-orange-50" : ""
+                          }`}
                       >
                         Upload Image
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-                        Delete
-                      </th>
+                      {userRole === "admin" && (
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
+                          Delete
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -2144,27 +2131,24 @@ function DelegationDataPage() {
                               </div>
                             </td>
                             <td
-                              className={`px-6 py-4 min-w-[140px] ${
-                                !account["col17"] ? "bg-yellow-50" : ""
-                              }`}
+                              className={`px-6 py-4 min-w-[140px] ${!account["col17"] ? "bg-yellow-50" : ""
+                                }`}
                             >
                               <div className="text-sm text-gray-900 whitespace-normal break-words">
                                 {formatDateTimeForDisplay(account["col6"])}
                               </div>
                             </td>
                             <td
-                              className={`px-6 py-4 min-w-[140px] ${
-                                !account["col17"] ? "bg-green-50" : ""
-                              }`}
+                              className={`px-6 py-4 min-w-[140px] ${!account["col17"] ? "bg-green-50" : ""
+                                }`}
                             >
                               <div className="text-sm text-gray-900 whitespace-normal break-words">
                                 {formatDateTimeForDisplay(account["col10"])}
                               </div>
                             </td>
                             <td
-                              className={`px-6 py-4 min-w-[120px] ${
-                                !account["col17"] ? "bg-blue-50" : ""
-                              }`}
+                              className={`px-6 py-4 min-w-[120px] ${!account["col17"] ? "bg-blue-50" : ""
+                                }`}
                             >
                               <select
                                 disabled={!isSelected}
@@ -2183,9 +2167,8 @@ function DelegationDataPage() {
                               </select>
                             </td>
                             <td
-                              className={`px-6 py-4 min-w-[140px] ${
-                                !account["col17"] ? "bg-indigo-50" : ""
-                              }`}
+                              className={`px-6 py-4 min-w-[140px] ${!account["col17"] ? "bg-indigo-50" : ""
+                                }`}
                             >
                               <input
                                 type="date"
@@ -2196,20 +2179,20 @@ function DelegationDataPage() {
                                 value={
                                   nextTargetDate[account._id]
                                     ? (() => {
-                                        const dateStr =
-                                          nextTargetDate[account._id];
-                                        if (dateStr && dateStr.includes("/")) {
-                                          const datePart =
-                                            dateStr.split(" ")[0]; // Get only date part if datetime
-                                          const [day, month, year] =
-                                            datePart.split("/");
-                                          return `${year}-${month.padStart(
-                                            2,
-                                            "0",
-                                          )}-${day.padStart(2, "0")}`;
-                                        }
-                                        return dateStr;
-                                      })()
+                                      const dateStr =
+                                        nextTargetDate[account._id];
+                                      if (dateStr && dateStr.includes("/")) {
+                                        const datePart =
+                                          dateStr.split(" ")[0]; // Get only date part if datetime
+                                        const [day, month, year] =
+                                          datePart.split("/");
+                                        return `${year}-${month.padStart(
+                                          2,
+                                          "0",
+                                        )}-${day.padStart(2, "0")}`;
+                                      }
+                                      return dateStr;
+                                    })()
                                     : ""
                                 }
                                 onChange={(e) => {
@@ -2244,9 +2227,8 @@ function DelegationDataPage() {
                               />
                             </td>
                             <td
-                              className={`px-6 py-4 min-w-[200px] max-w-[250px] ${
-                                !account["col17"] ? "bg-purple-50" : ""
-                              }`}
+                              className={`px-6 py-4 min-w-[200px] max-w-[250px] ${!account["col17"] ? "bg-purple-50" : ""
+                                }`}
                             >
                               <textarea
                                 placeholder="Enter remarks"
@@ -2301,11 +2283,10 @@ function DelegationDataPage() {
                                 <div className="flex flex-col gap-2">
                                   <label
                                     htmlFor={`upload-${account._id}`}
-                                    className={`flex items-center cursor-pointer ${
-                                      account["col9"]?.toUpperCase() === "YES"
-                                        ? "text-red-600 font-medium"
-                                        : "text-purple-600 hover:text-purple-800"
-                                    } ${isDisabled ? "pointer-events-none opacity-50" : ""}`}
+                                    className={`flex items-center cursor-pointer ${account["col9"]?.toUpperCase() === "YES"
+                                      ? "text-red-600 font-medium"
+                                      : "text-purple-600 hover:text-purple-800"
+                                      } ${isDisabled ? "pointer-events-none opacity-50" : ""}`}
                                   >
                                     <Upload className="h-4 w-4 mr-1" />
                                     <span className="text-xs">
@@ -2314,10 +2295,10 @@ function DelegationDataPage() {
                                         : "Upload Image"}
                                       {account["col9"]?.toUpperCase() ===
                                         "YES" && (
-                                        <span className="text-red-500 ml-1">
-                                          *
-                                        </span>
-                                      )}
+                                          <span className="text-red-500 ml-1">
+                                            *
+                                          </span>
+                                        )}
                                     </span>
                                   </label>
 
@@ -2350,20 +2331,22 @@ function DelegationDataPage() {
                                 </div>
                               )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteRow(account);
-                                }}
-                                disabled={deletingRows.has(account._id)}
-                                className="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
-                              >
-                                {deletingRows.has(account._id)
-                                  ? "Deleting..."
-                                  : "Delete"}
-                              </button>
-                            </td>
+                            {userRole === "admin" && (
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteRow(account);
+                                  }}
+                                  disabled={deletingRows.has(account._id)}
+                                  className="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
+                                >
+                                  {deletingRows.has(account._id)
+                                    ? "Deleting..."
+                                    : "Delete"}
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         );
                       })
@@ -2397,9 +2380,8 @@ function DelegationDataPage() {
                     return (
                       <div
                         key={account._id}
-                        className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${
-                          isSelected ? "bg-purple-50 border-purple-200" : ""
-                        } ${rowColorClass}`}
+                        className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${isSelected ? "bg-purple-50 border-purple-200" : ""
+                          } ${rowColorClass}`}
                       >
                         {/* TODAY Badge */}
                         {isTodayTask && (
@@ -2526,16 +2508,16 @@ function DelegationDataPage() {
                               value={
                                 nextTargetDate[account._id]
                                   ? (() => {
-                                      const dateStr =
-                                        nextTargetDate[account._id];
-                                      if (dateStr && dateStr.includes("/")) {
-                                        const datePart = dateStr.split(" ")[0];
-                                        const [day, month, year] =
-                                          datePart.split("/");
-                                        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-                                      }
-                                      return dateStr;
-                                    })()
+                                    const dateStr =
+                                      nextTargetDate[account._id];
+                                    if (dateStr && dateStr.includes("/")) {
+                                      const datePart = dateStr.split(" ")[0];
+                                      const [day, month, year] =
+                                        datePart.split("/");
+                                      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+                                    }
+                                    return dateStr;
+                                  })()
                                   : ""
                               }
                               onChange={(e) => {
@@ -2620,24 +2602,22 @@ function DelegationDataPage() {
                                     startCamera();
                                   }}
                                   disabled={!isSelected || isDisabled}
-                                  className={`flex items-center px-3 py-2 rounded-lg border-2 text-sm font-medium ${
-                                    isSelected
-                                      ? "bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 shadow-md"
-                                      : "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
-                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                  className={`flex items-center px-3 py-2 rounded-lg border-2 text-sm font-medium ${isSelected
+                                    ? "bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 shadow-md"
+                                    : "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
                                   <Camera className="h-4 w-4 mr-1" />
                                   <span>Camera</span>
                                 </button>
 
                                 <label
-                                  className={`flex items-center px-3 py-2 rounded-lg border-2 text-sm font-medium ${
-                                    isSelected
-                                      ? account["col9"]?.toUpperCase() === "YES"
-                                        ? "bg-red-50 border-red-300 text-red-700 hover:bg-red-100 shadow-md"
-                                        : "bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 shadow-md"
-                                      : "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
-                                  }`}
+                                  className={`flex items-center px-3 py-2 rounded-lg border-2 text-sm font-medium ${isSelected
+                                    ? account["col9"]?.toUpperCase() === "YES"
+                                      ? "bg-red-50 border-red-300 text-red-700 hover:bg-red-100 shadow-md"
+                                      : "bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 shadow-md"
+                                    : "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed"
+                                    }`}
                                 >
                                   <Upload className="h-4 w-4 mr-1" />
                                   <span>
@@ -2658,21 +2638,23 @@ function DelegationDataPage() {
                               </div>
                             )}
                           </div>
-                          <div className="mt-3">
-                            <button
-                              onClick={() => {
-                                if (!isSelected) return;
-                                if (!confirm("Delete permanently?")) return;
-                                handleDeleteRow(account);
-                              }}
-                              disabled={deletingRows.has(account._id)}
-                              className="w-full py-2 rounded-lg border-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50"
-                            >
-                              {deletingRows.has(account._id)
-                                ? "Deleting..."
-                                : "Delete Task"}
-                            </button>
-                          </div>
+                          {userRole === "admin" && (
+                            <div className="mt-3">
+                              <button
+                                onClick={() => {
+                                  if (!isSelected) return;
+                                  if (!confirm("Delete permanently?")) return;
+                                  handleDeleteRow(account);
+                                }}
+                                disabled={deletingRows.has(account._id)}
+                                className="w-full py-2 rounded-lg border-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50"
+                              >
+                                {deletingRows.has(account._id)
+                                  ? "Deleting..."
+                                  : "Delete Task"}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );

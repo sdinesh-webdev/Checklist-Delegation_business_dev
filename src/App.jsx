@@ -61,18 +61,17 @@ function App() {
         <Route
           path="/dashboard/quick-task"
           element={
-            <ProtectedRoute allowedRoles={["admin", "user"]}>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <QuickTask />
             </ProtectedRoute>
           }
         />
 
 
-        {/* Assign Task route - for admin and user */}
         <Route
           path="/dashboard/assign-task"
           element={
-            <ProtectedRoute allowedRoles={["admin", "user"]}>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminAssignTask />
             </ProtectedRoute>
           }
